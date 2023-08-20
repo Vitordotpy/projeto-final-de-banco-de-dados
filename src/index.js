@@ -4,20 +4,24 @@ const url = "postgres://professor:professor@database-3.cobbz7a38cty.us-east-1.rd
 
 const client = new bd.Client(url);
 
-function insertUser(CPF_CNPJ){
+function insertAdress(adress){
     client.connect();
-    var insert;
-    const query = client.query(`SELECT id FROM mybd.User WHERE id=${CPF_CNPJ}`);
-    query.then((response) => insert = response == null);
-    if( insert ){
-        const query2 = client.query(`INSERT INTO mybd.User VALUES ()`);
-        query2.then((response) => console.log("Inserted: "+response.fields));
-    }
-    client.end();
+    const query2 = client.query(`INSERT INTO mydb.adress (cep, cidade, uf, numero, bairro, complemento) VALUES ('${adress.cep}','${adress.cidade}','${adress.uf}',${adress.numero},'${adress.bairro}','${adress.complemento}')`);
+    query2.then((response) => {
+        console.log("Inserted: "+response.fields.values.toString);
+        client.end();
+    });
+    
 }
 
-function selectUser(CPF_CNPJ){
+function selectAdress(id) {
     client.connect();
-    const query = client.query(`SELECT id FROM mybd.User WHERE id=${CPF_CNPJ}`);
-    query.then((response)=> console.log("User: "+response.fields));
+    const query = client.query(`SELECT id, cep, bairro, cidade FROM mydb.adress WHERE id=${id}`);
+    query.then((response)=>  {
+        console.log("Adress: "+response.rowCount);
+        client.end();
+    });
 }
+
+//insertAdress({cep:'49600000', cidade:'São Cristóvão', uf:'SE', numero:49, bairro:'Rosa Elze', complemento:'apt 3'});
+//selectAdress(1);
