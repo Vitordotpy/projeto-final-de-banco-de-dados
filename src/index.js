@@ -4,24 +4,28 @@ const url = "postgres://professor:professor@database-3.cobbz7a38cty.us-east-1.rd
 
 const client = new bd.Client(url);
 
+client.connect();
+
+function selectAdress(id) {
+    const query = client.query(`SELECT id, cep, bairro, cidade FROM mydb.adress WHERE id=${id}`);
+    query.then((response)=>  {
+        console.log("Selected Adress:");
+        response.rows.map(row => console.log(row));
+        client.end();
+    });
+}
+
 function insertAdress(adress){
-    client.connect();
+    
     const query2 = client.query(`INSERT INTO mydb.adress (cep, cidade, uf, numero, bairro, complemento) VALUES ('${adress.cep}','${adress.cidade}','${adress.uf}',${adress.numero},'${adress.bairro}','${adress.complemento}')`);
     query2.then((response) => {
-        console.log("Inserted: "+response.fields.values.toString);
-        client.end();
+        if(response.rowCount > 0){
+            console.log(`Inserted Adress:('${adress.cep}','${adress.cidade}','${adress.uf}',${adress.numero},'${adress.bairro}','${adress.complemento}')`);
+            selectAdress(3);
+        }
+
     });
     
 }
 
-function selectAdress(id) {
-    client.connect();
-    const query = client.query(`SELECT id, cep, bairro, cidade FROM mydb.adress WHERE id=${id}`);
-    query.then((response)=>  {
-        console.log("Adress: "+response.rowCount);
-        client.end();
-    });
-}
-
-//insertAdress({cep:'49600000', cidade:'São Cristóvão', uf:'SE', numero:49, bairro:'Rosa Elze', complemento:'apt 3'});
-//selectAdress(1);
+insertAdress({cep:'49600000', cidade:'São Cristóvão', uf:'SE', numero:49, bairro:'Rosa Elze', complemento:'apt 3'});
