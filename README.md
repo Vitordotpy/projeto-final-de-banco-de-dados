@@ -6,7 +6,7 @@
 
 ## Como Executar
 **1 - execute o terminal no diretório do arquivo index.js**  
-**2 - se necessário instale as dependencias do nvm através do comando abaixo no terminal**  
+**2 - se necessário instale as dependencias do npm através do comando abaixo no terminal**  
 ```
 npm install
 ```
