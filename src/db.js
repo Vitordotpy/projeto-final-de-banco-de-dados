@@ -18,7 +18,7 @@ module.exports = class db {
         this.client.release();
     }
 
-    async insert(values, table)  {
+    async insert(table, values)  {
         try {
             // Begin of a transaction
             await this.client.query('BEGIN');
@@ -44,7 +44,7 @@ module.exports = class db {
             await this.client.query(sql);
             // Trying to commit query
             await this.client.query('COMMIT');
-            this.client
+            this.release();
         } catch (e) {
             // Roolback the query if got a exception
             await this.client.query('ROOLBACK');
@@ -78,7 +78,7 @@ module.exports = class db {
             await this.client.query(sql);
             // Trying to commit query
             await this.client.query('COMMIT');
-            this.client
+            this.release();
         } catch (e) {
             // Roolback the query if got a exception
             await this.client.query('ROOLBACK');
@@ -112,7 +112,7 @@ module.exports = class db {
             await this.client.query(sql);
             // Trying to commit query
             await this.client.query('COMMIT');
-            this.client
+            this.release();
         } catch (e) {
             // Roolback the query if got a exception
             await this.client.query('ROOLBACK');
@@ -120,7 +120,7 @@ module.exports = class db {
         }
     }
 
-    async update(values, table, userId)  {
+    async update(table, values, userId)  {
         try {
             // Begin of a transaction
             await this.client.query('BEGIN');
@@ -146,7 +146,7 @@ module.exports = class db {
             await this.client.query(sql);
             // Trying to commit query
             await this.client.query('COMMIT');
-            this.client
+            this.release();
         } catch (e) {
             // Roolback the query if got a exception
             await this.client.query('ROOLBACK');
