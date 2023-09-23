@@ -1,156 +1,137 @@
-import { Pool } from 'pg';
+const { Pool } = require('pg');
 
 module.exports = class db {
-    url = "postgres://professor:professor@database-3.cobbz7a38cty.us-east-1.rds.amazonaws.com/ealugueldb"
-
-    client; 
-
-    constructor() {
-        this.client = new Pool(url);
-        this.connect();
+    async connect() {
+        var pool = new Pool({
+            host: 'database-3.cobbz7a38cty.us-east-1.rds.amazonaws.com',
+            port: '5432',
+            user: 'professor',
+            database: 'ealugueldb',
+            password: 'professor',
+        })
+        return await pool.connect();
     }
 
-    connect(){
-        this.client.connect();
-    }
-
-    release(){
-        this.client.release();
-    }
-
-    async insert(table, values)  {
+    async insert(table, values) {
+        const client = await this.connect();
         try {
             // Begin of a transaction
-            await this.client.query('BEGIN');
+            await client.query('BEGIN');
             var sql;
             switch (table) {
-                case 'user':
-                    sql = `INSERT INTO mydb.user VALUES ${values}`;
+                case '/user':
+                    sql = `INSERT INTO mydb.user (contact_id, adress_id, cpf_cnpj, nome, sobrenome, email, senha, locador, status) VALUES ${values}`;
                     break;
-                case 'adress':
-                    sql = `INSERT INTO mydb.adress VALUES ${values}`;
+                case '/adress':
+                    sql = `INSERT INTO mydb.adress (cep, cidade, uf, numero, bairro, complemento) VALUES ${values}`;
                     break;
-                case 'contact':
-                    sql = `INSERT INTO mydb.contact VALUES ${values}`;
-                    break;
-                case 'resource':
-                    sql = `INSERT INTO mydb.resource VALUES ${values}`;
-                    break;
-                case 'rent':
-                    sql = `INSERT INTO mydb.rent VALUES ${values}`;
+                case '/contact':
+                    sql = `INSERT INTO mydb.contact (telefone, email, whatsapp) VALUES ${values}`;
                     break;
             }
             // Stacking the query
-            await this.client.query(sql);
+            await client.query(sql);
             // Trying to commit query
-            await this.client.query('COMMIT');
-            this.release();
+            await client.query('COMMIT');
         } catch (e) {
             // Roolback the query if got a exception
-            await this.client.query('ROOLBACK');
+            await client.query('ROLLBACK');
             throw e;
+        } finally {
+            client.release();
         }
     }
 
-    async select(table, userId)  {
+    async select(table, userId) {
+        const client = this.connect();
         try {
             // Begin of a transaction
-            await this.client.query('BEGIN');
+            await client.query('BEGIN');
             var sql;
             switch (table) {
-                case 'user':
+                case '/user':
                     sql = `SELECT * FROM mydb.user WHERE id=${userId}`;
                     break;
-                case 'adress':
+                case '/adress':
                     sql = `SELECT * FROM mydb.adress WHERE id=${userId}`;
                     break;
-                case 'contact':
+                case '/contact':
                     sql = `SELECT * FROM mydb.contact WHERE id=${userId}`;
                     break;
-                case 'resource':
-                    sql = `SELECT * FROM mydb.resource WHERE id=${userId}`;
-                    break;
-                case 'rent':
-                    sql = `SELECT * FROM mydb.rent WHERE id=${userId}`;
-                    break;
             }
             // Stacking the query
-            await this.client.query(sql);
+            var result = await client.query(sql);
             // Trying to commit query
-            await this.client.query('COMMIT');
-            this.release();
+            await client.query('COMMIT');
+            console.log(result);
         } catch (e) {
             // Roolback the query if got a exception
-            await this.client.query('ROOLBACK');
+            await client.query('ROLLBACK');
             throw e;
+        } finally {
+            client.release();
         }
     }
 
-    async delete(table, userId)  {
+    async delete(table, userId) {
+        const client = this.connect();
         try {
             // Begin of a transaction
-            await this.client.query('BEGIN');
+            await client.query('BEGIN');
             var sql;
             switch (table) {
-                case 'user':
+                case '/user':
                     sql = `DELETE FROM mydb.user WHERE id=${userId}`;
                     break;
-                case 'adress':
+                case '/adress':
                     sql = `DELETE FROM mydb.adress WHERE id=${userId}`;
                     break;
-                case 'contact':
+                case '/contact':
                     sql = `DELETE FROM mydb.contact WHERE id=${userId}`;
-                    break;
-                case 'resource':
-                    sql = `DELETE FROM mydb.resource WHERE id=${userId}`;
-                    break;
-                case 'rent':
-                    sql = `DELETE FROM mydb.rent WHERE id=${userId}`;
                     break;
             }
             // Stacking the query
-            await this.client.query(sql);
+            await client.query(sql);
             // Trying to commit query
-            await this.client.query('COMMIT');
-            this.release();
+            await client.query('COMMIT');
+
         } catch (e) {
             // Roolback the query if got a exception
-            await this.client.query('ROOLBACK');
+            await client.query('ROLLBACK');
+
             throw e;
+        } finally {
+            client.release();
         }
     }
 
-    async update(table, values, userId)  {
+    async update(table, values, userId) {
+        const client = this.connect();
         try {
             // Begin of a transaction
-            await this.client.query('BEGIN');
+            await client.query('BEGIN');
             var sql;
             switch (table) {
-                case 'user':
+                case '/user':
                     sql = `UPDATE mydb.user SET ${values} WHERE id=${userId}`;
                     break;
-                case 'adress':
+                case '/adress':
                     sql = `UPDATE mydb.user SET ${values} WHERE id=${userId}`;
                     break;
-                case 'contact':
-                    sql = `UPDATE mydb.user SET ${values} WHERE id=${userId}`;
-                    break;
-                case 'resource':
-                    sql = `UPDATE mydb.user SET ${values} WHERE id=${userId}`;
-                    break;
-                case 'rent':
+                case '/contact':
                     sql = `UPDATE mydb.user SET ${values} WHERE id=${userId}`;
                     break;
             }
             // Stacking the query
-            await this.client.query(sql);
+            await client.query(sql);
             // Trying to commit query
-            await this.client.query('COMMIT');
-            this.release();
+            await client.query('COMMIT');
         } catch (e) {
             // Roolback the query if got a exception
-            await this.client.query('ROOLBACK');
+            await this.client.query('ROLLBACK');
             throw e;
+        } finally {
+            client.release();
         }
     }
 }
