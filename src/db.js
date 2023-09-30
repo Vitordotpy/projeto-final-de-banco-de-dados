@@ -43,7 +43,7 @@ module.exports = class db {
     }
 
     async select(table, userId) {
-        const client = this.connect();
+        const client = await this.connect();
         try {
             // Begin of a transaction
             await client.query('BEGIN');
@@ -60,10 +60,10 @@ module.exports = class db {
                     break;
             }
             // Stacking the query
-            var result = await client.query(sql);
+            const result = await client.query(sql);
             // Trying to commit query
-            await client.query('COMMIT');
-            console.log(result);
+            await client.query('COMMIT').then((values) => {console.log(JSON.stringify(result.rows));});
+            
         } catch (e) {
             // Roolback the query if got a exception
             await client.query('ROLLBACK');
@@ -74,7 +74,7 @@ module.exports = class db {
     }
 
     async delete(table, userId) {
-        const client = this.connect();
+        const client = await this.connect();
         try {
             // Begin of a transaction
             await client.query('BEGIN');
@@ -106,7 +106,7 @@ module.exports = class db {
     }
 
     async update(table, values, userId) {
-        const client = this.connect();
+        const client = await this.connect();
         try {
             // Begin of a transaction
             await client.query('BEGIN');
@@ -116,10 +116,10 @@ module.exports = class db {
                     sql = `UPDATE mydb.user SET ${values} WHERE id=${userId}`;
                     break;
                 case '/adress':
-                    sql = `UPDATE mydb.user SET ${values} WHERE id=${userId}`;
+                    sql = `UPDATE mydb.adress SET ${values} WHERE id=${userId}`;
                     break;
                 case '/contact':
-                    sql = `UPDATE mydb.user SET ${values} WHERE id=${userId}`;
+                    sql = `UPDATE mydb.contact SET ${values} WHERE id=${userId}`;
                     break;
             }
             // Stacking the query
@@ -128,7 +128,7 @@ module.exports = class db {
             await client.query('COMMIT');
         } catch (e) {
             // Roolback the query if got a exception
-            await this.client.query('ROLLBACK');
+            await client.query('ROLLBACK');
             throw e;
         } finally {
             client.release();
